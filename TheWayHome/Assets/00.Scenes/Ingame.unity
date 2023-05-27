@@ -470,6 +470,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 142185931624559025, guid: 1c6006fb1e573c3409148fbde77635ce, type: 3}
+      propertyPath: m_Size.y
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 2140720992526202147, guid: 1c6006fb1e573c3409148fbde77635ce, type: 3}
       propertyPath: m_Name
       value: Kitten01
