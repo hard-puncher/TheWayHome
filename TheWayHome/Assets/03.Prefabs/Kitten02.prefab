@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 2757271998721835419}
   - component: {fileID: 2757271998721835416}
   - component: {fileID: 2700533391094405289}
-  - component: {fileID: 6782697620837465244}
   - component: {fileID: 1671312355778724842}
+  - component: {fileID: 6464776117472105919}
   m_Layer: 0
   m_Name: Kitten02
   m_TagString: Untagged
@@ -124,27 +124,11 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: fc0883f776a35c343ac469b078a4a43d, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!70 &6782697620837465244
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2757271998721835417}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0.001, y: -0.04}
-  m_Size: {x: 0.12, y: 0.1}
-  m_Direction: 1
 --- !u!114 &1671312355778724842
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -159,7 +143,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxSpeed: 4.5
   jumpPower: 8
+  isJump: 0
   dashDelay: 0
   canDash: 1
-  nowDash: 0
   dashPower: 5
+  maxClimbSpeed: 3
+  isWallTouch: 0
+  isWallClimb: 0
+--- !u!70 &6464776117472105919
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2757271998721835417}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: -0.04}
+  m_Size: {x: 0.063, y: 0.1}
+  m_Direction: 0
