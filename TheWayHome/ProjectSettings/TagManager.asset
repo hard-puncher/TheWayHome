@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Ground
   - Wall
+  - BG_Day
+  - BG_Night
   layers:
   - Default
   - TransparentFX
