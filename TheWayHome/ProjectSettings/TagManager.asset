@@ -8,11 +8,16 @@ TagManager:
   - Wall
   - BG_Day
   - BG_Night
+  - Cover
+  - Box
+  - Money
+  - Fish
+  - AttackRange
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Player
   - Water
   - UI
   - Platform

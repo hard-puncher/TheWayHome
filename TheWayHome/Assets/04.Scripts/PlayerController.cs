@@ -22,6 +22,12 @@ public class PlayerController : MonoBehaviour
     public float dashPower;
     public float maxClimbSpeed;
     public bool isFall; // 벽에 닿았을 때 rigid.velocity가 왜인진 모르겠으나 음수가 되어 fall 애니메이션이 실행되는 현상 발생, 벽과 닿았을 때는 isFall을 false로 해서 해결
+    public bool isAttack;
+    public bool canAttack;
+    public float attackDelay;
+
+    // 공격 범위 게임오브젝트
+    public GameObject attackRange;
 
     // Wall Climb
     public bool isWallTouch;    // 벽과 맞닿음 체크
@@ -62,12 +68,12 @@ public class PlayerController : MonoBehaviour
         }
 
         // 시작 시 플레이어 위치 지정
-        this.transform.position = new Vector3(-9, -3.2f, 0);
+        this.transform.position = new Vector3(-15, -3.2f, 0);
     }
 
     void Update()
     {
-        // canDash가 false 이면 시간을 누적하여 쿨타임 3초가 지나면 대쉬가 가능해진다.
+        // 대쉬 딜레이 측정
         if(!canDash)
         {
             dashDelay += Time.deltaTime;
@@ -77,7 +83,18 @@ public class PlayerController : MonoBehaviour
                 canDash = true;
             }
         }
+        // 공격 딜레이 측정
+        if(!canAttack)
+        {
+            attackDelay += Time.deltaTime;
+            if(attackDelay >= 1f)
+            {
+                attackDelay = 0f;
+                canAttack = true;
+            }
+        }
 
+        Attack();
         Jump();
         FlipX();
         RunAnim();
@@ -108,6 +125,25 @@ public class PlayerController : MonoBehaviour
     {
         isFall = true;
         isDash = false;
+    }
+
+    // Attack
+    private void Attack()
+    {
+        if(canAttack && Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            canAttack = false;
+            isAttack = true;
+            animator.SetTrigger("isAttack");
+            attackRange.SetActive(true);
+            Invoke("AttackOff", 0.3f);
+        }
+    }
+
+    private void AttackOff()
+    {
+        isAttack = false;
+        attackRange.SetActive(false);
     }
 
     // Dash 상태일 때는 최대속도를 2배 늘려 빠르게 이동
