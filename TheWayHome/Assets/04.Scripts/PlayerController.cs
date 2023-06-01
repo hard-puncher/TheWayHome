@@ -136,6 +136,8 @@ public class PlayerController : MonoBehaviour
             isAttack = true;
             animator.SetTrigger("isAttack");
             attackRange.SetActive(true);
+            // 공격을 할 때 플레이어 스프라이트 flipX가 True이면 attackRange의 콜라이더는 살짝 왼쪽에, False이면 오른쪽에 그대로 활성화한다.
+            attackRange.GetComponent<BoxCollider2D>().offset = sprite.flipX == true ? new Vector2(-0.18f, 0f) : new Vector2(0f, 0f);
             Invoke("AttackOff", 0.3f);
         }
     }
