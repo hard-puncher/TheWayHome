@@ -135,7 +135,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 3
   m_Sprite: {fileID: -704811462, guid: 2ec6716ff7e4d574297f3ba11ec006b2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -228,6 +228,9 @@ MonoBehaviour:
   isAttack: 0
   canAttack: 0
   attackDelay: 0
+  isDie: 0
+  isInvincible: 0
+  knockBackPower: 30
   attackRange: {fileID: 6569122287562333657}
   isWallTouch: 0
   canWallClimb: 0

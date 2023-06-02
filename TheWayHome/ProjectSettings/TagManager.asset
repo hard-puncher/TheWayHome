@@ -13,6 +13,8 @@ TagManager:
   - Money
   - Fish
   - AttackRange
+  - Enemy
+  - Icicle
   layers:
   - Default
   - TransparentFX

@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
     CapsuleCollider2D capsule;
     SpriteRenderer sprite;
     Animator animator;
-
+    
     [Space(10f)]
     [Header("Status")]
     public float maxSpeed;
@@ -25,6 +25,9 @@ public class PlayerController : MonoBehaviour
     public bool isAttack;
     public bool canAttack;
     public float attackDelay;
+    public bool isDie;
+    public bool isInvincible;   // 무적상태 체크, true일땐 피격당하지 않는다. 콜라이더를 끄게 되면 떨어지므로
+    public float knockBackPower;
 
     // 공격 범위 게임오브젝트
     public GameObject attackRange;
@@ -73,8 +76,10 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        CheckDie();
+
         // 대쉬 딜레이 측정
-        if(!canDash)
+        if (!canDash)
         {
             dashDelay += Time.deltaTime;
             if(dashDelay >= 3f)
@@ -98,7 +103,7 @@ public class PlayerController : MonoBehaviour
         Jump();
         FlipX();
         RunAnim();
-        SneakAnim();    
+        SneakAnim();
     }
 
     void FixedUpdate()
@@ -119,12 +124,63 @@ public class PlayerController : MonoBehaviour
             isJump = false;
             animator.SetBool("isFall", false);
         }
+
+        if(collision.gameObject.tag == "Enemy" && !isInvincible)
+        {
+            // 적 공격력만큼 체력 감소
+            GameManager.Instance.playerCurHP -= collision.gameObject.GetComponent<EnemyController>().enemyDamage;
+
+            CheckDie();
+
+            // 넉백 -> 부딪힌 적의 x좌표가 플레이어보다 오른쪽에 있으면 왼쪽으로 튕기고, 왼쪽에 있으면 오른쪽으로 튕긴다.
+            rigid.AddForce(collision.gameObject.GetComponent<Rigidbody2D>().position.x > rigid.position.x ? Vector2.left * knockBackPower : Vector2.right * knockBackPower, ForceMode2D.Impulse);
+
+            // 무적상태화
+            Invincible();
+
+            animator.SetTrigger("isHurt");       
+        }
     }
 
     void OnCollisionExit2D(Collision2D collision)
     {
-        isFall = true;
-        isDash = false;
+        if (collision.gameObject.tag == "Ground")
+        {
+            isFall = true;
+            isDash = false;
+        } 
+    }
+
+    // 무적 상태
+    public void Invincible()
+    {
+        sprite.color = new Color(1, 1, 1, 0.4f);
+        isInvincible = true;
+        Invoke("OffInvincible", 1f);    // 1초간 무적
+    }
+
+    private void OffInvincible()
+    {
+        sprite.color = new Color(1, 1, 1, 1f);
+        isInvincible = false;
+    }
+    // 사망 체크
+    private void CheckDie()
+    {
+        if (GameManager.Instance.playerCurHP <= 0f && !isDie)
+        {
+            isDie = true;
+            capsule.enabled = false;
+            rigid.isKinematic = true;
+            animator.SetTrigger("isDie");
+
+            Invoke("StopGame", 2f);
+        }
+    }
+
+    private void StopGame()
+    {
+        Time.timeScale = 0f;
     }
 
     // Attack

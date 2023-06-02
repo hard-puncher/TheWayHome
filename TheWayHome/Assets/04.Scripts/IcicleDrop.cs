@@ -7,6 +7,7 @@ public class IcicleDrop : MonoBehaviour
     BoxCollider2D box;
     Rigidbody2D rigid;
 
+    public int icicleDamage;
     void Awake()
     {
         box = GetComponent<BoxCollider2D>();
@@ -29,8 +30,18 @@ public class IcicleDrop : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "Player")
+        if (collision.gameObject.tag == "Player" && !collision.gameObject.GetComponent<PlayerController>().isInvincible)
+        {
             gameObject.SetActive(false);
+
+            // 플레이어 무적상태화
+            collision.gameObject.GetComponent<PlayerController>().Invincible();
+
+            collision.gameObject.GetComponent<Animator>().SetTrigger("isHurt");
+
+            GameManager.Instance.playerCurHP -= icicleDamage;
+        }
+             
         if(rigid.velocity.y < 0 && collision.gameObject.tag == "Ground")
             gameObject.SetActive(false);
     }
