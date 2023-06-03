@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     CapsuleCollider2D capsule;
     SpriteRenderer sprite;
     Animator animator;
+    //public LayerMask currentMask;  // 엄폐물에 숨을 시 레이어 마스크를 바꿔 적이 추적할 수 없게 한다.
     
     [Space(10f)]
     [Header("Status")]
@@ -28,6 +29,7 @@ public class PlayerController : MonoBehaviour
     public bool isDie;
     public bool isInvincible;   // 무적상태 체크, true일땐 피격당하지 않는다. 콜라이더를 끄게 되면 떨어지므로
     public float knockBackPower;
+    public bool isHide; // 현재 엄폐중인지 체크, 엄폐중일땐 점프 X
 
     // 공격 범위 게임오브젝트
     public GameObject attackRange;
@@ -42,6 +44,7 @@ public class PlayerController : MonoBehaviour
         capsule = GetComponent<CapsuleCollider2D>();
         sprite = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+        //currentMask = GetComponent<LayerMask>();
     }
 
     void Start()
@@ -100,7 +103,8 @@ public class PlayerController : MonoBehaviour
         }
 
         Attack();
-        Jump();
+        if(!isHide)
+            Jump();
         FlipX();
         RunAnim();
         SneakAnim();
@@ -156,10 +160,11 @@ public class PlayerController : MonoBehaviour
     {
         sprite.color = new Color(1, 1, 1, 0.4f);
         isInvincible = true;
+     
         Invoke("OffInvincible", 1f);    // 1초간 무적
     }
-
-    private void OffInvincible()
+    // 무적 상태 해제
+    public void OffInvincible()
     {
         sprite.color = new Color(1, 1, 1, 1f);
         isInvincible = false;
@@ -183,7 +188,7 @@ public class PlayerController : MonoBehaviour
         Time.timeScale = 0f;
     }
 
-    // Attack
+    // 공격
     private void Attack()
     {
         if(canAttack && Input.GetKeyDown(KeyCode.LeftControl))
@@ -194,7 +199,7 @@ public class PlayerController : MonoBehaviour
             attackRange.SetActive(true);
             // 공격을 할 때 플레이어 스프라이트 flipX가 True이면 attackRange의 콜라이더는 살짝 왼쪽에, False이면 오른쪽에 그대로 활성화한다.
             attackRange.GetComponent<BoxCollider2D>().offset = sprite.flipX == true ? new Vector2(-0.18f, 0f) : new Vector2(0f, 0f);
-            Invoke("AttackOff", 0.3f);
+            Invoke("AttackOff", 0.5f);
         }
     }
 
@@ -310,6 +315,9 @@ public class PlayerController : MonoBehaviour
 
     void MoveHor()
     {
+        // 공격 중엔 이동하지 않는다.
+        if (isAttack)
+            return;
         // Move By Key Control
         float h = Input.GetAxisRaw("Horizontal");
 

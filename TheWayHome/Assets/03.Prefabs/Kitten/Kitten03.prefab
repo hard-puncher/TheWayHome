@@ -122,7 +122,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
+  m_LinearDrag: 2
   m_AngularDrag: 0.05
   m_GravityScale: 2
   m_Material: {fileID: 6200000, guid: fc0883f776a35c343ac469b078a4a43d, type: 2}
@@ -159,7 +159,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxSpeed: 4.5
-  jumpPower: 15
+  jumpPower: 25
   isJump: 0
   dashDelay: 0
   canDash: 1
@@ -173,6 +173,7 @@ MonoBehaviour:
   isDie: 0
   isInvincible: 0
   knockBackPower: 30
+  isHide: 0
   attackRange: {fileID: 8815024630277319242}
   isWallTouch: 0
   canWallClimb: 0

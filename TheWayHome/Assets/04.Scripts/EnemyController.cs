@@ -91,7 +91,7 @@ public class EnemyController : MonoBehaviour
     void FindPlayer()
     {
         Debug.DrawRay(rigid.position, sprite.flipX == true ? Vector3.left : Vector3.right, new Color(0, 1, 0));
-        RaycastHit2D rayHit = Physics2D.Raycast(rigid.position + new Vector2(0f, -1.5f), sprite.flipX == true ? Vector3.left : Vector3.right, 3, LayerMask.GetMask("Player"));
+        RaycastHit2D rayHit = Physics2D.Raycast(rigid.position + new Vector2(0f, -1.5f), sprite.flipX == true ? Vector3.left : Vector3.right, 6, LayerMask.GetMask("Player"));
 
         // 플레이어가 레이에 닿았으면
         if (rayHit.collider != null && !isFindPlayer)

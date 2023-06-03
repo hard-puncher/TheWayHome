@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6454731122094315755}
   - component: {fileID: 5987979014790010584}
   - component: {fileID: 8405822190419371136}
+  - component: {fileID: 32385947432463904}
   m_Layer: 0
   m_Name: Snowman4
   m_TagString: Cover
@@ -109,5 +110,17 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.27006483, y: 0.2378498}
+  m_Size: {x: 0.2, y: 0.2378498}
   m_EdgeRadius: 0
+--- !u!114 &32385947432463904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3370693575152577440}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5e2f56dcfe56614295ce3b6415633ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

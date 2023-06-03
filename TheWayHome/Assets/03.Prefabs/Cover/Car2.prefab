@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6396556104171237324}
   - component: {fileID: 3577836599547955688}
   - component: {fileID: 3263273225835456031}
+  - component: {fileID: 9180135314682580257}
   m_Layer: 0
   m_Name: Car2
   m_TagString: Cover
@@ -109,5 +110,17 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.47, y: 0.3}
+  m_Size: {x: 0.4, y: 0.3}
   m_EdgeRadius: 0
+--- !u!114 &9180135314682580257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8824152293411139602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5e2f56dcfe56614295ce3b6415633ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

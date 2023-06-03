@@ -15,6 +15,7 @@ TagManager:
   - AttackRange
   - Enemy
   - Icicle
+  - EndPoint
   layers:
   - Default
   - TransparentFX

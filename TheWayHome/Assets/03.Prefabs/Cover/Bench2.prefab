@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7771284886040474058}
   - component: {fileID: 7455469359764541989}
   - component: {fileID: 7267603423933978687}
+  - component: {fileID: -8986591361054341814}
   m_Layer: 0
   m_Name: Bench2
   m_TagString: Cover
@@ -109,5 +110,17 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.3121313, y: 0.18360731}
+  m_Size: {x: 0.25, y: 0.18360731}
   m_EdgeRadius: 0
+--- !u!114 &-8986591361054341814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8056958093272272580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5e2f56dcfe56614295ce3b6415633ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
