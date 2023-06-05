@@ -137,6 +137,9 @@ public class PlayerController : MonoBehaviour
         // 무적상태가 아니면서 적과 부딪혔을 때
         if(collision.gameObject.tag == "Enemy" && !isInvincible)
         {
+            // 피격 사운드 재생
+            SoundManager.instance.PlaySE("Hit");
+
             // 적 공격력만큼 체력 감소
             GameManager.Instance.playerCurHP -= collision.gameObject.GetComponent<EnemyController>().enemyDamage;
 
@@ -221,6 +224,8 @@ public class PlayerController : MonoBehaviour
         // 공중에 떠 있을 때는 대쉬를 멈춤.
         if (!isDash)
             return;
+        // 대쉬 사운드 재생
+        SoundManager.instance.PlaySE("Dash");
         maxSpeed = 9f;
         Invoke("DashOff", 0.833f);  // Dash 애니메이션 길이만큼 invoke를 걸어준다.
     }

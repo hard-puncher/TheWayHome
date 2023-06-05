@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 // 싱글톤으로 만들어 플레이어 정보와 체력, UI를 관리한다.
 public class GameManager : MonoBehaviour
@@ -33,6 +34,12 @@ public class GameManager : MonoBehaviour
     private GameObject pauseGroupUI;    // 일시정지 시 활성화되는 버튼그룹
 
     [SerializeField]
+    private GameObject soundGroupUI;   // 일시정지-사운드 옵션 선택 시 활성화
+
+    [SerializeField]
+    private GameObject lobbyGroupUI;   // 일시정지-로비 선택 시 활성화
+
+    [SerializeField]
     private Slider playerHPBar; // 플레이어 체력바
 
     // 플레이어 체력
@@ -41,24 +48,16 @@ public class GameManager : MonoBehaviour
   
     private void Awake()
     {
-        if(instance == null)
-        {
-            // 이 클래스의 인스턴스가 탄생했을 때 전역변수 instance에 게임매니저 인스턴스가 담겨있지 않다면, 자신을 넣어준다.
-            instance = this;
-
-            // 씬 전환이 되더라도 파괴되지 않게한다.
-            DontDestroyOnLoad(this.gameObject);
-        }
-        else
-        {
-            // 만약 씬 이동이 되었는데 그 씬에도 게임매니저가 존재한다면
-            // 새로운 씬의 게임매니저를 파괴한다.
-            Destroy(this.gameObject);
-        }
+        instance = this;
     }
 
     private void Start()
     {
+        // 로비 BGM 멈춤
+        SoundManager.instance.StopBGM("Lobby");
+        // 인게임 BGM 재생
+        SoundManager.instance.PlayBGM("Ingame");
+
         // 저장된 선택한 캐릭터 인덱스 가져오기
         int selectedCharacterIndex = PlayerPrefs.GetInt("SelectedCharacterIndex", -1);
 
@@ -109,15 +108,78 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
     }
 
-    // 옵션 버튼
-    public void OnIngameOptionButtonClicked()
+    // 사운드 옵션 버튼
+    public void OnIngameSoundButtonClicked()
     {
-        // 옵션 UI 활성화
+        // 일시정지 그룹 비활성화
+        pauseGroupUI.SetActive(false);
+        // 사운드 옵션 UI 활성화
+        soundGroupUI.SetActive(true);
     }
 
     // 로비 버튼
     public void OnIngameLobbyButtonClicked()
     {
+        // 일시정지 그룹 비활성화
+        pauseGroupUI.SetActive(false);
         // 로비 귀환 UI 활성화
+        lobbyGroupUI.SetActive(true);
+    }
+
+    // 로비 버튼 하위 그룹
+    // 로비 Yes 클릭 시
+    public void OnLobbyYesButtonClicked()
+    {
+        // 현재 스테이지 저장
+
+        // 다시 시간이 흐르게 함(로비로 돌아갔다가 다시 시작할 경우 멈추는 현상 발생
+        Time.timeScale = 1f;
+
+        // 로비 BGM 재생
+        SoundManager.instance.PlayBGM("Lobby");
+
+        // 로비 이동
+        SceneManager.LoadScene("Lobby");
+        
+        // 인게임 BGM 멈춤
+        //SoundManager.instance.StopBGM("Ingame");
+    }
+
+    // 로비 No 클릭 or 닫기 버튼 클릭 시
+    public void OnLobbyNoButtonClicked()
+    {
+        // 로비 귀환 UI 비활성화
+        lobbyGroupUI.SetActive(false);
+        // 일시정지 그룹 활성화
+        pauseGroupUI.SetActive(true);
+    }
+
+
+    // 사운드 옵션 버튼 하위 그룹
+    // BGM 음량 조절 슬라이더
+    public void BgmControl()
+    {
+
+    }
+
+    // 효과음 음량 조절 슬라이더
+    public void SeControl()
+    {
+
+    }
+
+    // 사운드 옵션 창 닫기 버튼 클릭 시
+    public void OnSoundQuitButtonClicked()
+    {
+        // 옵션 비활성화
+        soundGroupUI.SetActive(false);
+        // 일시정지 그룹 활성화
+        pauseGroupUI.SetActive(true);
+    }
+
+    // 버튼 클릭 사운드 함수(인스펙터-OnClick에 추가)
+    public void PlayButtonClickSound()
+    {
+        SoundManager.instance.PlaySE("ButtonClick");
     }
 }

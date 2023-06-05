@@ -23,10 +23,16 @@ public class BoxDestroy : MonoBehaviour
         // 고양이의 공격과 닿으면 상자 내구도를 1씩 감소시킨다.
         if(collision.gameObject.tag == "AttackRange")
         {
+            // 박스 히트 사운드 재생
+            SoundManager.instance.PlaySE("BoxHit");
+
             boxHp--;
             // 내구도가 0이되면 애니메이션을 재생한 후 비활성화하고, 생선 프리팹을 그자리에 생성한다.
             if(boxHp <= 0)
             {
+                // 박스 파괴 사운드 재생
+                SoundManager.instance.PlaySE("BoxDestroy");
+
                 animator.SetTrigger("isOpened");
                 Invoke("BoxDisable", 0.8f); // 애니메이션의 시간만큼 기다렸다가 비활성화
             }
