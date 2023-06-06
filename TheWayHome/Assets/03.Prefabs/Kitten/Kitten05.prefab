@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8465264378892639673}
   m_Layer: 0
   m_Name: AttackRange
-  m_TagString: Untagged
+  m_TagString: AttackRange
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -74,7 +74,7 @@ GameObject:
   - component: {fileID: 1204162300302748203}
   m_Layer: 3
   m_Name: Kitten05
-  m_TagString: AttackRange
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -216,22 +216,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5221ed3034a593b4aac8eb5875c05c17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 4.5
-  jumpPower: 25
   isJump: 0
-  dashDelay: 0
   canDash: 1
   isDash: 0
-  dashPower: 5
-  maxClimbSpeed: 3
   isFall: 0
   isAttack: 0
   canAttack: 0
-  attackDelay: 0
   isDie: 0
   isInvincible: 0
-  knockBackPower: 30
   isHide: 0
-  attackRange: {fileID: 6569122287562333657}
   isWallTouch: 0
   canWallClimb: 0
+  maxSpeed: 4.5
+  jumpPower: 25
+  dashDelay: 0
+  dashPower: 5
+  maxClimbSpeed: 3
+  attackDelay: 0
+  knockBackPower: 30
+  attackRange: {fileID: 6569122287562333657}

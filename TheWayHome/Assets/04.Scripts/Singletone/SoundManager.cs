@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Audio;
+using UnityEngine.UI;
 
 [System.Serializable]
 public class Sound
@@ -33,12 +35,27 @@ public class SoundManager : MonoBehaviour
 
     public string[] playSoundName;  // 재생 중인 효과음 이름 배열
 
+    // 사운드 조절
+    // 오디오 믹서
+    public AudioMixer audioMixer;
+
+    // 씬 전환이 되어도 설정한 볼륨 정보가 유지되도록 저장할 변수
+    public float bgmSliderValue;    // bgm 슬라이더 값
+    public float bgmSoundVolume;    // bgm 볼륨
+    public float seSliderValue;     // se 슬라이더 값
+    public float seSoundVolume;     // se 볼륨
+
     private void Start()
     {
         playSoundName = new string[audioSourceSE.Length];   // 효과음 재생기의 수만큼 초기화
 
         // 로비 BGM 재생
         PlayBGM("Lobby");
+
+        bgmSliderValue = 1;
+        bgmSoundVolume = 1;
+        seSliderValue = 1;
+        seSoundVolume = 1;
     }
 
     // 효과음 재생 함수
@@ -107,5 +124,18 @@ public class SoundManager : MonoBehaviour
             }
         }
         Debug.Log("재생 중인" + _name + "사운드가 없습니다.");
+    }
+
+    // BGM 볼륨 조절
+    public void SetBgmVolume(float value)
+    {
+        // 부드러운 조절을 위해 로그 연산 값 전달
+        audioMixer.SetFloat("BGM", Mathf.Log10(value) * 20);
+    }
+
+    // SE 볼륨 조절
+    public void SetSeVolume(float value)
+    {
+        audioMixer.SetFloat("SE", Mathf.Log10(value) * 20);
     }
 }

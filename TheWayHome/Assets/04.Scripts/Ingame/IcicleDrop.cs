@@ -32,6 +32,9 @@ public class IcicleDrop : MonoBehaviour
     {
         if (collision.gameObject.tag == "Player" && !collision.gameObject.GetComponent<PlayerController>().isInvincible)
         {
+            // 피격 사운드 재생
+            SoundManager.instance.PlaySE("Hit");
+
             gameObject.SetActive(false);
 
             // 플레이어 무적상태화
@@ -43,7 +46,11 @@ public class IcicleDrop : MonoBehaviour
         }
              
         if(rigid.velocity.y < 0 && collision.gameObject.tag == "Ground")
+        {
+            // 효과음 재생
+            SoundManager.instance.PlaySE("IcicleDrop");
             gameObject.SetActive(false);
+        }           
     }
 
     void OnDisable()

@@ -12,12 +12,18 @@ public class EndPoint : MonoBehaviour
         if(collision.gameObject.tag == "Player")
         {
             Debug.Log("엔드포인트 도달! 다음 스테이지로 이동.");
-            // 현재 씬의 빌드 인덱스를 가져온다.
-            int currentSceneIndex = SceneManager.GetActiveScene().buildIndex;
-            // 다음 씬의 빌드 인덱스는 현재 씬의 인덱스에 1을 더한다.
-            int nextSceneIndex = currentSceneIndex + 1;
-            // 다음 씬을 로드한다.
-            SceneManager.LoadScene(nextSceneIndex);
+            // 현재 스테이지를 문자열로 받는다.
+            string currentStage = SceneManager.GetActiveScene().name;
+            // 문자열에서 현재 스테이지의 번호를 추출한다.
+            int currentStageNumber = int.Parse(currentStage.Substring(currentStage.Length - 1));
+            // 해당 스테이지는 클리어했으므로, 다음 스테이지를 저장한다.
+            int nextStageNumber = currentStageNumber + 1;
+            // 다음 스테이지를 문자열로 만든다.
+            string nextStage = "Stage" + nextStageNumber;
+            // 다음 스테이지를 로드한다.
+            SceneManager.LoadScene(nextStage);
+            // 스테이지 정보 저장
+            DataManager.instance.SaveStageData(nextStageNumber);
         }
     }
 }

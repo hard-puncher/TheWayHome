@@ -29,7 +29,11 @@ public class LobbyManager : MonoBehaviour
     public GameObject accountResetGroupUI;
 
     // 시작 메뉴 하위의 UI 활성화 시 시작 메뉴 버튼들과의 상호작용을 방지하기 위한 플래그
-    private bool isLowerGroupUIOn; 
+    private bool isLowerGroupUIOn;
+
+    // 볼륨 슬라이더
+    public Slider bgmSlider;
+    public Slider seSlider;
    
     private void Awake()
     {
@@ -51,6 +55,15 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        // 로비 씬으로 이동 시 인게임 씬에서 설정한 사운드 볼륨및 슬라이더 값에 맞게 조절.
+        bgmSlider.value = SoundManager.instance.bgmSliderValue;
+        SoundManager.instance.SetBgmVolume(SoundManager.instance.bgmSoundVolume);
+        seSlider.value = SoundManager.instance.seSliderValue;
+        SoundManager.instance.SetSeVolume(SoundManager.instance.seSoundVolume);
+    }
+
     // 게임시작: 시작 메뉴-play버튼 클릭 시
     public void OnPlayButtonClicked()
     {
@@ -67,6 +80,11 @@ public class LobbyManager : MonoBehaviour
     {
         if (isLowerGroupUIOn)
             return;
+
+        // 저장된 최고 스테이지 정보 받아오기
+        int saveStage = DataManager.instance.LoadStageData();
+        // 저장된 씬 로드
+        SceneManager.LoadScene("Stage" + saveStage);
     }
 
     // 옵션: 시작 메뉴-option버튼 클릭 시
@@ -116,19 +134,6 @@ public class LobbyManager : MonoBehaviour
             // 선택한 캐릭터 정보를 기기에 저장
             PlayerPrefs.SetInt("SelectedCharacterIndex", selectedCharacterIndex);
         }
-    }
-
-    // 옵션 버튼 하위 그룹
-    // BGM 음량 조절 슬라이더
-    public void BgmControl()
-    {
-
-    }
-
-    // 효과음 음량 조절 슬라이더
-    public void SeControl()
-    {
-
     }
 
     // 계정 초기화 버튼 클릭 시
