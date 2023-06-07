@@ -228,6 +228,7 @@ MonoBehaviour:
   isWallTouch: 0
   canWallClimb: 0
   maxSpeed: 4.5
+  dashSpeed: 9
   jumpPower: 25
   dashDelay: 0
   dashPower: 5

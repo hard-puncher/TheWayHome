@@ -13,9 +13,15 @@ public class LobbyManager : MonoBehaviour
     // 캐릭터 선택 창
     public GameObject characterSelectionUI;
     
-    // 캐릭터 선택 후 활성화되는 게임 시작 버튼
+    // 처음부터 -> 캐릭터 선택 후 활성화되는 게임 시작 버튼
     public GameObject gameStartButton;
-    
+
+    // 이어하기 -> 캐릭터 선택 후 활성화되는 이어하기 버튼
+    public GameObject continueStartButton;
+
+    // 처음부터를 눌렀는지, 이어하기를 눌렀는지를 체크해서 캐릭터를 골랐을 때, 첫 스테이지로 가는 버튼을 활성화 할지 기존 스테이지로 가는 버튼을 활성화 할지 결정할 변수.
+    public bool isContinueClicked = false;
+
     // 선택한 캐릭터 번호
     private int selectedCharacterIndex = -1;
     
@@ -70,7 +76,7 @@ public class LobbyManager : MonoBehaviour
         if (isLowerGroupUIOn)
             return;
 
-        // 시작메뉴를 비활성화하고 캐릭터 선택 UI를 활성화한다.
+        // 시작메뉴를 비활성화하고 캐릭터 선택 UI(처음부터 전용)를 활성화한다.
         menuGroupUI.SetActive(false);
         characterSelectionUI.SetActive(true);
     }
@@ -81,10 +87,12 @@ public class LobbyManager : MonoBehaviour
         if (isLowerGroupUIOn)
             return;
 
-        // 저장된 최고 스테이지 정보 받아오기
-        int saveStage = DataManager.instance.LoadStageData();
-        // 저장된 씬 로드
-        SceneManager.LoadScene("Stage" + saveStage);
+        // 이어하기 버튼을 눌렀으므로 true로 바꿔준다.
+        isContinueClicked = true;
+
+        // 시작메뉴를 비활성화하고 캐릭터 선택 UI(이어하기 전용)를 활성화한다.
+        menuGroupUI.SetActive(false);
+        characterSelectionUI.SetActive(true);
     }
 
     // 옵션: 시작 메뉴-option버튼 클릭 시
@@ -114,16 +122,20 @@ public class LobbyManager : MonoBehaviour
         menuGroupUI.SetActive(true);
     }
 
-    // 게임시작 버튼 -> 캐릭터 선택
+    // 처음부터 -> 게임시작 버튼 -> 캐릭터 선택
     public void OnCharacterSelected(int characterIndex)
     {
         // 선택한 캐릭터 인덱스 저장
         selectedCharacterIndex = characterIndex;
 
-        // 게임 시작 버튼 활성화
-        gameStartButton.SetActive(true);
+        // 게임 시작 버튼 활성화(이어하기를 눌러서 왔으면 이어하기 버튼을 활성화하고, 처음부터를 눌러서 왔으면 처음부터 버튼을 활성화한다.)
+        if (!isContinueClicked)
+            gameStartButton.SetActive(true);
+        else
+            continueStartButton.SetActive(true);
     }
 
+    // 처음부터 -> 캐릭터 선택 -> 게임 스타트 버튼 클릭 시
     public void OnGameStartButtonClicked()
     {
         // 캐릭터를 선택했다면
@@ -131,6 +143,23 @@ public class LobbyManager : MonoBehaviour
         {
             // 선택한 캐릭터 인덱스를 인게임 씬으로 전달
             SceneManager.LoadScene("Stage0");
+            // 선택한 캐릭터 정보를 기기에 저장
+            PlayerPrefs.SetInt("SelectedCharacterIndex", selectedCharacterIndex);
+        }
+    }
+
+    // 이어하기 -> 캐릭터 선택 -> 이어하기 버튼 클릭 시
+    public void OnGameContinueButtonClicked()
+    {
+        // 캐릭터를 선택했다면
+        if (selectedCharacterIndex != -1)
+        {
+            // 다시 로비로 왔을 때를 위해 플래그를 초기화
+            isContinueClicked = false;
+            // 저장된 최고 스테이지 정보 받아오기
+            int saveStage = DataManager.instance.LoadStageData();
+            // 저장된 씬 로드
+            SceneManager.LoadScene("Stage" + saveStage);
             // 선택한 캐릭터 정보를 기기에 저장
             PlayerPrefs.SetInt("SelectedCharacterIndex", selectedCharacterIndex);
         }
@@ -147,6 +176,7 @@ public class LobbyManager : MonoBehaviour
     public void OnAccountResetYesButtonClicked()
     {
         // 모든 세이브 데이터 초기화
+        DataManager.instance.DeleteAllSaveData();
 
         // 계정 초기화 창 비활성화
         accountResetGroupUI.SetActive(false);

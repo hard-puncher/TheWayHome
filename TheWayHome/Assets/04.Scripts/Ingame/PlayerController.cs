@@ -14,7 +14,8 @@ public class PlayerController : MonoBehaviour
     [Header("Flag")]
     public bool isJump; // 땅에 닿았는지 체크
     public bool canDash = true;
-    public bool isDash;
+    public bool isDash; // 점프중 대쉬 방지용
+    public bool nowDash;    // 대쉬 중인가?
     public bool isFall; // 벽에 닿았을 때 rigid.velocity가 왜인진 모르겠으나 음수가 되어 fall 애니메이션이 실행되는 현상 발생, 벽과 닿았을 때는 isFall을 false로 해서 해결
     public bool isAttack;   // 공격중인지 체크
     public bool canAttack;  // 공격주기가 돌아왔는지 체크
@@ -25,10 +26,13 @@ public class PlayerController : MonoBehaviour
     public bool isWallTouch;    // 벽과 맞닿음 체크
     public bool canWallClimb;   // isWallTouch가 true가 되면 canWallClimb이 true가 되어 벽을 오를 수 있다.
 
+    // 머리 위에 플랫폼이 맞닿아있는지 체크
+    private RaycastHit2D rayHitSneak;
+
     [Space(10f)]
     [Header("Status By Character")]
     public float maxSpeed;  // 캐릭터별 이동속도
-    
+   
     public float jumpPower; // 캐릭터별 점프력
     
     public float dashDelay; // 캐릭터별 대쉬주기
@@ -42,7 +46,6 @@ public class PlayerController : MonoBehaviour
     [Space(10f)]
     [Header("Common")] 
     public GameObject attackRange;  // 공격 범위 게임오브젝트
-
 
     void Awake()
     {
@@ -224,6 +227,7 @@ public class PlayerController : MonoBehaviour
         // 공중에 떠 있을 때는 대쉬를 멈춤.
         if (!isDash)
             return;
+        nowDash = true;
         // 대쉬 사운드 재생
         SoundManager.instance.PlaySE("Dash");
         maxSpeed = 9f;
@@ -232,6 +236,7 @@ public class PlayerController : MonoBehaviour
 
     void DashOff()
     {
+        nowDash = false;
         maxSpeed = 4.5f;
     }
 
@@ -284,6 +289,45 @@ public class PlayerController : MonoBehaviour
 
     void SneakAnim()
     {
+        // 통로 기어가기 중 일어서는 오류를 방지하기 위해 플레이어 기준 위쪽으로 레이를 쏴서, 위에 플랫폼이 있다면 일어날 수 없게 한다.
+        Debug.DrawRay(rigid.position, Vector3.up, new Color(0, 1, 0));
+
+        rayHitSneak = Physics2D.Raycast(rigid.position, Vector3.up, 0.6f, LayerMask.GetMask("Platform"));
+
+        if(rayHitSneak.collider != null)
+        {
+            // 웅크린 상태에선 좁은 통로를 지날 수 있도록 콜라이더 크기와 오프셋을 조절한다.
+            capsule.offset = new Vector2(capsule.offset.x, -0.05f);
+            capsule.size = new Vector2(capsule.size.x, 0.08f);
+
+            animator.SetBool("isRun", false);
+
+            // 웅크린 상태에선 maxSpeed를 감소시킨다.
+            maxSpeed = 1.5f;
+
+            // Crouch 애니메이션
+            animator.SetBool("isCrouch", true);
+            // Sneak(기어가기)      
+            if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow))
+            {   
+                animator.SetBool("isCrouch", false);
+                animator.SetBool("isSneak", true);
+            }
+
+            if (Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.RightArrow))
+            {
+                animator.SetBool("isCrouch", true);
+                animator.SetBool("isSneak", false);
+            }
+        }
+        else
+        {
+            animator.SetBool("isCrouch", false);
+            animator.SetBool("isSneak", false);
+            if(!nowDash)
+                maxSpeed = 4.5f;
+        }
+
         // Crouch(웅크리기) & GetUp : 아래키를 누르면 웅크리고, 아래키를 누른채 좌우키를 누르면 기어간다.
         if (Input.GetKey(KeyCode.DownArrow))
         {
@@ -296,7 +340,7 @@ public class PlayerController : MonoBehaviour
             maxSpeed = 1.5f;
             // Crouch 애니메이션
             animator.SetBool("isCrouch", true);
-            // Sneak(기어가기)
+            // Sneak(기어가기)      
             if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow))
             {
                 animator.SetBool("isCrouch", false);

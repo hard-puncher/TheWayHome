@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
+using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public class StageData  // 스테이지 정보를 담는 클래스. Json으로 만들어줄 코드는 클래스 형태여야 한다.
@@ -68,7 +69,42 @@ public class DataManager : MonoBehaviour
         {
             Debug.Log("저장된 정보가 없습니다. 튜토리얼을 시작합니다.");
 
-            return 1;   // 스테이지 1(튜토리얼)
+            return 0;   // 스테이지 0(튜토리얼)
         }
+    }
+
+    // 모든 저장 정보를 초기화하는 함수
+    public void DeleteAllSaveData()
+    {
+        // 저장된 스테이지가 있을 경우
+        if (File.Exists(savePath))
+        {
+            File.Delete(savePath);  // 저장정보를 삭제한다.
+        }
+    }
+
+    // 어플리케이션이 예기치 못하게 종료될 때도 최고 스테이지를 판단해서 스테이지 정보를 저장해주는 함수
+    public void SafeSaveData()
+    {
+        // 저장된 스테이지 정보를 읽어온다.
+        int savedStageNumber = LoadStageData();
+
+        // 현재 스테이지를 문자열로 받는다.
+        string currentStage = SceneManager.GetActiveScene().name;
+
+        // 문자열에서 현재 스테이지의 번호를 추출한다.
+        int currentStageNumber = int.Parse(currentStage.Substring(currentStage.Length - 1));
+
+        // 저장된 스테이지가 현재 스테이지보다 높으면 저장하지 않는다.
+        if (savedStageNumber > currentStageNumber)
+            return;
+        // 저장된 스테이지보다 현재 스테이지가 높거나 같으면 현재 스테이지를 저장한다.
+        else
+            SaveStageData(currentStageNumber);
+    }
+
+    private void OnApplicationQuit()
+    {
+        SafeSaveData();
     }
 }

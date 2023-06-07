@@ -158,25 +158,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5221ed3034a593b4aac8eb5875c05c17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 4.5
-  jumpPower: 25
   isJump: 0
-  dashDelay: 0
   canDash: 1
   isDash: 0
-  dashPower: 5
-  maxClimbSpeed: 3
   isFall: 0
   isAttack: 0
   canAttack: 0
-  attackDelay: 0
   isDie: 0
   isInvincible: 0
-  knockBackPower: 30
   isHide: 0
-  attackRange: {fileID: 8905377083884287693}
   isWallTouch: 0
   canWallClimb: 0
+  maxSpeed: 4.5
+  dashSpeed: 9
+  jumpPower: 25
+  dashDelay: 0
+  dashPower: 5
+  maxClimbSpeed: 3
+  attackDelay: 0
+  knockBackPower: 30
+  attackRange: {fileID: 8905377083884287693}
 --- !u!1 &8905377083884287693
 GameObject:
   m_ObjectHideFlags: 0
