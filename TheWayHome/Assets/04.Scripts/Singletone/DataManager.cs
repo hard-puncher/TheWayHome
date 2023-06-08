@@ -105,6 +105,7 @@ public class DataManager : MonoBehaviour
 
     private void OnApplicationQuit()
     {
-        SafeSaveData();
+        if(SceneManager.GetActiveScene().name != "Lobby")
+            SafeSaveData();
     }
 }

@@ -203,7 +203,8 @@ public class LobbyManager : MonoBehaviour
     // 종료 Yes 클릭 시
     public void OnQuitYesButtonClicked()
     {
-        Quit();
+        //Quit();
+        Application.Quit();
     }
 
     // 종료 No 클릭 시 or 종료 창 닫기 버튼 클릭 시

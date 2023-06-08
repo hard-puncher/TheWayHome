@@ -217,8 +217,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isJump: 0
+  isGround: 0
   canDash: 1
   isDash: 0
+  nowDash: 0
   isFall: 0
   isAttack: 0
   canAttack: 0
@@ -227,12 +229,19 @@ MonoBehaviour:
   isHide: 0
   isWallTouch: 0
   canWallClimb: 0
-  maxSpeed: 4.5
-  dashSpeed: 9
-  jumpPower: 25
+  defaultSpeed: 6
+  dashSpeed: 12
+  crawlSpeed: 3
+  applySpeed: 0
+  jumpPower:
+  - 15
+  - 25
   dashDelay: 0
   dashPower: 5
   maxClimbSpeed: 3
   attackDelay: 0
   knockBackPower: 30
   attackRange: {fileID: 6569122287562333657}
+  defaultFriction: 0.03
+  wallSlideFriction: 0.3
+  jumpCount: 2

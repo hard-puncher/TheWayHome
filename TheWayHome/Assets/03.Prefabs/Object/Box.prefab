@@ -145,6 +145,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42e16c3e3f752ec44beecbd1f7d47ffd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boxHp: 3
+  boxHp: 1
   fishPrefab: {fileID: 8229008984666270902, guid: 17a78ec79f413b24586d1d66a8b6834a, type: 3}
   dropPower: 3

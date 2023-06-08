@@ -39,6 +39,8 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private GameObject lobbyGroupUI;   // 일시정지-로비 선택 시 활성화
 
+    public GameObject gameOverUI;  // 플레이어 사망 시 활성화
+
     [SerializeField]
     private Slider playerHPBar; // 플레이어 체력바
 
@@ -106,9 +108,13 @@ public class GameManager : MonoBehaviour
     // 일시정지 버튼
     public void OnPauseButtonClicked()
     {
-        // 시간을 멈추고 메뉴를 활성화한다.
-        Time.timeScale = 0f;
-        pauseGroupUI.SetActive(true);
+        // 게임오버 ui가 비활성화 상태일때만
+        if(!gameOverUI.activeSelf)
+        {
+            // 시간을 멈추고 메뉴를 활성화한다.
+            Time.timeScale = 0f;
+            pauseGroupUI.SetActive(true);
+        }     
     }
 
     // 계속하기 버튼
@@ -184,5 +190,20 @@ public class GameManager : MonoBehaviour
     public void PlayButtonClickSound()
     {
         SoundManager.instance.PlaySE("ButtonClick");
+    }
+
+    // 게임 오버 - 재도전 버튼
+    public void OnRetryButtonClicked()
+    {
+        // 현재 스테이지를 문자열로 받는다.
+        string currentStage = SceneManager.GetActiveScene().name;
+
+        // 문자열에서 현재 스테이지의 번호를 추출한다.
+        int currentStageNumber = int.Parse(currentStage.Substring(currentStage.Length - 1));
+
+        // 현재 스테이지를 로드한다.
+        SceneManager.LoadScene("Stage" + currentStageNumber);
+
+        Time.timeScale = 1f;
     }
 }
