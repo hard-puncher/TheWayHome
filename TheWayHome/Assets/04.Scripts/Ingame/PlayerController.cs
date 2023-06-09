@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
     public bool isDie;
     public bool isInvincible;   // 무적상태 체크, true일땐 피격당하지 않는다.
     public bool isHide; // 현재 엄폐중인지 체크, 엄폐중일땐 점프 X
+    public bool isCrawl;    // 엎드리고 있는지 여부(엎드리고 있으면 적 뒤통수 범위에 있을 때 알아차리지 못하게 할것)
 
     // Wall Climb
     public bool isWallTouch;    // 벽과 맞닿음 체크
@@ -54,7 +55,8 @@ public class PlayerController : MonoBehaviour
     public GameObject attackRange;  // 공격 범위 게임오브젝트
     public float defaultFriction = 0.03f;   // 기본 마찰력(계단을 부드럽게 올라가는 정도)
     public float wallSlideFriction = 0.3f; // 벽에 닿았을 때 마찰력(잘 미끄러지지 않게끔)
-    public int jumpCount;   // 점프 가능 횟수(기본 2회?)
+    public int jumpCount;   // 점프 가능 횟수(기본 1회)
+    public int currentJumpCount;    // 실제 적용할 점프 가능 횟수(아이템 먹을 시 2회)
 
     void Awake()
     {
@@ -67,30 +69,11 @@ public class PlayerController : MonoBehaviour
     // 게임 시작후 캐릭터가 활성화될 때
     private void OnEnable()
     {
+        
         // 게임 시작 시 메인카메라를 찾아서 플레이어 자식으로 연결
         GameObject mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
         mainCamera.transform.SetParent(gameObject.transform);
-
-        // 게임 시작시 배경화면을 플레이어 자식으로 연결
-        GameObject backGround_Day = GameObject.FindGameObjectWithTag("BG_Day");
-        backGround_Day.transform.SetParent(gameObject.transform);
-        GameObject backGround_Night = GameObject.FindGameObjectWithTag("BG_Night");
-        backGround_Night.transform.SetParent(gameObject.transform);
-
-        // 게임 시작 시 현실 시간이 6~18시라면 낮 배경을, 18~6시라면 밤 배경을 활성화한다.
-        Debug.Log(DateTime.Now.Hour);
-        if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 18)
-        {
-            backGround_Day.SetActive(true);
-            backGround_Night.SetActive(false);
-        }
-        else if ((DateTime.Now.Hour >= 18 && DateTime.Now.Hour <= 24)
-            || DateTime.Now.Hour < 6)
-        {
-            backGround_Day.SetActive(false);
-            backGround_Night.SetActive(true);
-        }
-
+        
         // 시작 시 플레이어 위치 지정
         this.transform.position = new Vector3(-15, -3.2f, 0);
     }
@@ -150,10 +133,20 @@ public class PlayerController : MonoBehaviour
         if(collision.gameObject.tag == "Ground")
         {
             isGround = true;
-            jumpCount = 2;
+            jumpCount = currentJumpCount;
             animator.SetBool("isFall", false);
             animator.SetBool("isJump", false);
         }
+
+        // 떨어지는 장판에 착지 했을 때
+        if(collision.gameObject.tag == "FallingSheet")
+        {
+            isGround = true;
+            jumpCount = currentJumpCount;
+            animator.SetBool("isFall", false);
+            animator.SetBool("isJump", false);
+        }
+
         // 무적상태가 아니면서 적과 부딪혔을 때
         if(collision.gameObject.tag == "Enemy" && !isInvincible)
         {
@@ -170,6 +163,9 @@ public class PlayerController : MonoBehaviour
 
             // 무적상태화
             Invincible();
+
+            animator.SetBool("isFall", false);
+            animator.SetBool("isJump", false);
 
             animator.SetTrigger("isHurt");       
         }
@@ -279,8 +275,6 @@ public class PlayerController : MonoBehaviour
         {
             isJump = true;
             jumpTime = Time.time;   // 키 입력 시간 기록
-
-            //jumpCount--;    // 점프 가능 횟수 차감
         }
 
         if(Input.GetKeyUp(KeyCode.Space) && isJump)
@@ -358,6 +352,9 @@ public class PlayerController : MonoBehaviour
                 Dash(); // defaultSpeed를 일시적으로 늘려 빠르게 달리는 것처럼 보이게하는 함수
             }
             */
+
+            isCrawl = true; // 엎드리고 있음을 true로 한다.
+
             // 웅크린 상태에선 좁은 통로를 지날 수 있도록 콜라이더 크기와 오프셋을 조절한다.
             capsule.offset = new Vector2(capsule.offset.x, -0.05f);
             capsule.size = new Vector2(capsule.size.x, 0.08f);
@@ -385,6 +382,8 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            isCrawl = false;
+
             // 콜라이더 원래대로
             capsule.offset = new Vector2(capsule.offset.x, -0.025f);
             capsule.size = new Vector2(capsule.size.x, 0.13f);
@@ -398,6 +397,8 @@ public class PlayerController : MonoBehaviour
         // Crouch(웅크리기) & GetUp : 아래키를 누르면 웅크리고, 아래키를 누른채 좌우키를 누르면 기어간다.
         if (Input.GetKey(KeyCode.DownArrow))
         {
+            isCrawl = true; // 엎드리고 있음을 true로 한다.
+
             // 웅크린 상태에선 좁은 통로를 지날 수 있도록 콜라이더 크기와 오프셋을 조절한다.
             capsule.offset = new Vector2(capsule.offset.x, -0.05f);
             capsule.size = new Vector2(capsule.size.x, 0.08f);
@@ -424,6 +425,8 @@ public class PlayerController : MonoBehaviour
         // 아래키를 떼면 Crouch, Sneak 상태를 해제하고 Idle 상태로 돌아간다.
         if (Input.GetKeyUp(KeyCode.DownArrow))
         {
+            isCrawl = false;
+
             // 콜라이더 원래대로
             capsule.offset = new Vector2(capsule.offset.x, -0.025f);
             capsule.size = new Vector2(capsule.size.x, 0.13f);

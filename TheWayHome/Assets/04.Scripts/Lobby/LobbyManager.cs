@@ -47,7 +47,7 @@ public class LobbyManager : MonoBehaviour
         GameObject backGround_Day = GameObject.FindGameObjectWithTag("BG_Day");     
         GameObject backGround_Night = GameObject.FindGameObjectWithTag("BG_Night");
         
-        Debug.Log(DateTime.Now.Hour);
+        Debug.Log("현재 시간은 " + DateTime.Now.Hour);
         if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 18)
         {
             backGround_Day.SetActive(true);

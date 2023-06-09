@@ -16,6 +16,9 @@ TagManager:
   - Enemy
   - Icicle
   - EndPoint
+  - FallingSheet
+  - NoticeRange
+  - DetectionRange
   layers:
   - Default
   - TransparentFX

@@ -244,4 +244,5 @@ MonoBehaviour:
   attackRange: {fileID: 121089326942703907}
   defaultFriction: 0.03
   wallSlideFriction: 0.3
-  jumpCount: 2
+  jumpCount: 1
+  currentJumpCount: 1

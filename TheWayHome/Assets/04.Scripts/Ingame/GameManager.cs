@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System;
 
 // 싱글톤으로 만들어 플레이어 정보와 체력, UI를 관리한다.
 public class GameManager : MonoBehaviour
@@ -52,7 +53,10 @@ public class GameManager : MonoBehaviour
     // 플레이어 체력
     public float playerMaxHP = 100f;  // 플레이어 최대 체력(100초)
     public float playerCurHP; // 플레이어 현재 체력
-  
+
+    public GameObject backGround_Day;
+    public GameObject backGround_Night;
+
     private void Awake()
     {
         instance = this;
@@ -60,6 +64,20 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        // 게임 시작 시 현실 시간이 6~18시라면 낮 배경을, 18~6시라면 밤 배경을 활성화한다.
+        Debug.Log("현재 시간은 " + DateTime.Now.Hour);
+        if (DateTime.Now.Hour >= 6 && DateTime.Now.Hour < 18)
+        {
+            backGround_Day.SetActive(true);
+            backGround_Night.SetActive(false);
+        }
+        else if ((DateTime.Now.Hour >= 18 && DateTime.Now.Hour <= 24)
+            || DateTime.Now.Hour < 6)
+        {
+            backGround_Day.SetActive(false);
+            backGround_Night.SetActive(true);
+        }
+
         // 인게임 씬으로 이동 시 로비 씬에서 설정한 사운드 볼륨및 슬라이더 값에 맞게 조절.
         bgmSlider.value = SoundManager.instance.bgmSliderValue;
         SoundManager.instance.SetBgmVolume(SoundManager.instance.bgmSoundVolume);
@@ -88,6 +106,9 @@ public class GameManager : MonoBehaviour
     {
         DecreaseHPOverTime();
         UpdateHPBar();
+
+        backGround_Day.transform.position = player.transform.position;
+        backGround_Night.transform.position = player.transform.position;
     }
 
     // 실시간 체력 감소
