@@ -19,8 +19,8 @@ public class ParallaxBackground : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // 로비가 아닌 인게임에서만 배경 스크롤이 되게 한다.
-        if(SceneManager.GetActiveScene().name != "Lobby")
+        // 1. 로비가 아닌 인게임에서만 배경 스크롤이 되게 한다. 2. 플레이어가 벽과 닿아있지 않을 때만 스크롤 되게 한다. 수직이동 시엔 스크롤 되면 이상하므로
+        if(SceneManager.GetActiveScene().name != "Lobby" && !GameManager.Instance.player.GetComponent<PlayerController>().isWallTouch)
         {
             //무한 배경
             // 오른쪽으로 이동 -> 배경은 왼쪽으로 이동

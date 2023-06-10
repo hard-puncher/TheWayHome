@@ -181,6 +181,18 @@ public class PlayerController : MonoBehaviour
         } 
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "DeadZone")
+        {
+            rigid.velocity = new Vector2(0, 0); // y속도를 0으로 만들지 않으면 fall 애니메이션이 재생된다.
+            rigid.isKinematic = true;   // 추락 멈춘다.
+            GameManager.Instance.playerCurHP = 0f;      // 체력 0으로 만들어 CheckDie 조건 충족 시켜준다.
+            Debug.Log("맵 바깥으로 떨어졌습니다. 게임 오버입니다.");
+            CheckDie();
+        }       
+    }
+
     // 무적 상태
     public void Invincible()
     {
@@ -196,7 +208,7 @@ public class PlayerController : MonoBehaviour
         isInvincible = false;
     }
     // 사망 체크
-    private void CheckDie()
+    public void CheckDie()
     {
         if (GameManager.Instance.playerCurHP <= 0f && !isDie)
         {
