@@ -42,18 +42,10 @@ public class BoxDestroy : MonoBehaviour
     // 박스 비활성화 및 생선 프리팹 생성
     private void BoxDisable()
     {
-        // 50%의 확률로 생선을 드롭한다. 박스는 둘다 비활성화한다.
-        int fishOrNot = Random.Range(0, 10);
-        if(fishOrNot >= 0 && fishOrNot < 5)
-        {
-            GameObject fish = Instantiate(fishPrefab);
-            fish.transform.position = gameObject.transform.position;
-            gameObject.SetActive(false);    // 상자 비활성화
-            fish.GetComponent<Rigidbody2D>().AddForce(Vector2.up * dropPower, ForceMode2D.Impulse); // 생선 드롭시 위로 튀었다가 떨어지는 효과
-        }
-        else if(fishOrNot >= 5 && fishOrNot < 10)
-        {
-            gameObject.SetActive(false);    // 상자 비활성화
-        }        
+        // 100%의 확률로 생선을 드롭한다. 박스는 둘다 비활성화한다.
+        GameObject fish = Instantiate(fishPrefab);
+        fish.transform.position = gameObject.transform.position;
+        gameObject.SetActive(false);    // 상자 비활성화
+        fish.GetComponent<Rigidbody2D>().AddForce(Vector2.up * dropPower, ForceMode2D.Impulse); // 생선 드롭시 위로 튀었다가 떨어지는 효과
     }
 }

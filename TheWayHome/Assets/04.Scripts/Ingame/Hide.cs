@@ -19,21 +19,24 @@ public class Hide : MonoBehaviour
     private void OnTriggerStay2D(Collider2D collision)
     {
         // 플레이어가 땅에 닿았을 때, nowHide가 false일 때만 실행한다.
-        if (collision.gameObject.tag == "Player" && !collision.GetComponent<PlayerController>().isJump && !nowHide)
+        if (collision.gameObject.tag == "Player")
         {
-            Debug.Log("엄폐 중입니다.");
-            // 엄폐 중엔 점프를 막기 위해 isHide를 true로 한다.
-            collision.GetComponent<PlayerController>().isHide = true;
-            // Trigger로 바꿔도 추락하지 않도록 중력을 0으로 한다.
-            collision.GetComponent<Rigidbody2D>().gravityScale = 0f;
-            // 엄폐중엔 적이 통과할 수 있도록 Trigger상태로 한다.
-            collision.GetComponent<CapsuleCollider2D>().isTrigger = true;
             // 알파값 조절
             collision.GetComponent<SpriteRenderer>().color = new Color(1, 1, 1, 0.4f);
-            // 추적 불가를 위해 레이어마스크 잠시 변경한다.
-            collision.gameObject.layer = 0;
-            // 엄폐 완료 했으면 nowHide를 true로 바꿔서, OnTriggerStay가 지속적으로 호출되는 것을 방지한다.
-            nowHide = true;
+            if (!collision.GetComponent<PlayerController>().isJump && !nowHide)
+            {
+                Debug.Log("엄폐 중입니다.");
+                // 엄폐 중엔 점프를 막기 위해 isHide를 true로 한다.
+                collision.GetComponent<PlayerController>().isHide = true;
+                // Trigger로 바꿔도 추락하지 않도록 중력을 0으로 한다.
+                collision.GetComponent<Rigidbody2D>().gravityScale = 0f;
+                // 엄폐중엔 적이 통과할 수 있도록 Trigger상태로 한다.
+                collision.GetComponent<CapsuleCollider2D>().isTrigger = true;      
+                // 추적 불가를 위해 레이어마스크 잠시 변경한다.
+                collision.gameObject.layer = 0;
+                // 엄폐 완료 했으면 nowHide를 true로 바꿔서, OnTriggerStay가 지속적으로 호출되는 것을 방지한다.
+                nowHide = true;
+            }         
         }
     }
     

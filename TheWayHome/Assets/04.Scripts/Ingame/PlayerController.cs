@@ -26,9 +26,10 @@ public class PlayerController : MonoBehaviour
     public bool isCrawl;    // 엎드리고 있는지 여부(엎드리고 있으면 적 뒤통수 범위에 있을 때 알아차리지 못하게 할것)
 
     // Wall Climb
+    private RaycastHit2D rayHit;
     public bool isWallTouch;    // 벽과 맞닿음 체크
     public bool canWallClimb;   // isWallTouch가 true가 되면 canWallClimb이 true가 되어 벽을 오를 수 있다.
-
+   
     // 머리 위에 플랫폼이 맞닿아있는지 체크
     private RaycastHit2D rayHitSneak;
 
@@ -39,8 +40,7 @@ public class PlayerController : MonoBehaviour
     public float crawlSpeed = 3f;    // 캐릭터별 포복 속도
     public float applySpeed; // 실제로 적용될 속도
    
-    public float[] jumpPower; // 키 입력에 따른 점프력 정도를 담은 배열.
-    private float jumpTime; // 키 입력 시간
+    public float jumpPower; // 점프력
     
     public float dashDelay; // 캐릭터별 대쉬주기
     public float dashPower; // 캐릭터별 대쉬파워(defaultSpeed에 곱해줄 값)
@@ -106,7 +106,7 @@ public class PlayerController : MonoBehaviour
         if (!isDie)
         {
             Attack();
-            if (!isHide && jumpCount > 0)
+            if (!isHide && !isCrawl)
                 Jump();
             FlipX();
             RunAnim();
@@ -129,23 +129,26 @@ public class PlayerController : MonoBehaviour
         isDash = true;
         isFall = false;
 
-        // 땅에 착지했을 때
+        // 땅(벽)과 닿았을 때
         if(collision.gameObject.tag == "Ground")
         {
+            isJump = false;
             isGround = true;
             jumpCount = currentJumpCount;
             animator.SetBool("isFall", false);
             animator.SetBool("isJump", false);
         }
 
-        // 떨어지는 장판에 착지 했을 때
+        // 떨어지는 장판과 닿았을 때
         if(collision.gameObject.tag == "FallingSheet")
         {
+            isJump = false;
             isGround = true;
             jumpCount = currentJumpCount;
             animator.SetBool("isFall", false);
             animator.SetBool("isJump", false);
         }
+        
 
         // 무적상태가 아니면서 적과 부딪혔을 때
         if(collision.gameObject.tag == "Enemy" && !isInvincible)
@@ -190,7 +193,14 @@ public class PlayerController : MonoBehaviour
             GameManager.Instance.playerCurHP = 0f;      // 체력 0으로 만들어 CheckDie 조건 충족 시켜준다.
             Debug.Log("맵 바깥으로 떨어졌습니다. 게임 오버입니다.");
             CheckDie();
-        }       
+        }
+
+        // 점프 아이템과 충돌 시 isGround를 true로 해서 2단점프가 되게 함.
+        if(collision.gameObject.tag == "JumpStone")
+        {
+            isGround = true;
+            jumpCount++;
+        }
     }
 
     // 무적 상태
@@ -264,9 +274,6 @@ public class PlayerController : MonoBehaviour
     // Dash 상태일 때는 최대속도를 2배 늘려 빠르게 이동
     void Dash()
     {
-        // 공중에 떠 있을 때는 대쉬를 멈춤.
-        if (!isDash)
-            return;
         nowDash = true;
         // 대쉬 사운드 재생
         SoundManager.instance.PlaySE("Dash");
@@ -280,33 +287,55 @@ public class PlayerController : MonoBehaviour
         applySpeed = defaultSpeed;
     }
 
-    // 점프 - 키 입력 시간을 계산해서 짧게 누른 경우 낮게 점프. 길게 누른 경우 높게 점프한다.
+    // 점프
     void Jump()
     {
-        if (Input.GetKeyDown(KeyCode.Space)) //&& isGround)
+        
+        // 점프 가능횟수가 0이 아니고 스페이스바를 눌렀을 때
+        if (Input.GetKeyDown(KeyCode.Space) && isGround && jumpCount > 0)
         {
             isJump = true;
-            jumpTime = Time.time;   // 키 입력 시간 기록
-        }
-
-        if(Input.GetKeyUp(KeyCode.Space) && isJump)
-        {
-            isJump = false;
-            float jumpDuration = Time.time - jumpTime;  // 키 입력 시간 계산
 
             // Jump 애니메이션
             animator.SetBool("isJump", true);
             animator.SetBool("isFall", false);
 
-            // 숏 점프
-            if (jumpDuration < 0.2f)
-                rigid.AddForce(Vector2.up * jumpPower[0], ForceMode2D.Impulse);   
-            // 롱 점프
+            // 추락중에 점프할 경우 점프가 약해지므로 약간 보정
+            if (rigid.velocity.y < 0f)
+            {
+                rigid.AddForce(Vector2.up * jumpPower * 1.5f, ForceMode2D.Impulse);
+            }
+            // 점프 중에 또 점프할 경우
             else
-                rigid.AddForce(Vector2.up * jumpPower[1], ForceMode2D.Impulse);
+            {
+                rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+            }      
 
-            jumpCount--;    // 점프 가능 횟수 차감
+            jumpCount--;    // 점프 가능 횟수 차감     
         }
+        
+        /*
+        // isGround이고 스페이스바를 눌렀을 때
+        if (Input.GetKeyDown(KeyCode.Space) && isGround)
+        {
+            isJump = true;
+
+            // Jump 애니메이션
+            animator.SetBool("isJump", true);
+            animator.SetBool("isFall", false);
+
+            // 추락중에 점프할 경우 점프가 약해지므로 약간 보정
+            if (rigid.velocity.y < 0f)
+            {
+                rigid.AddForce(Vector2.up * jumpPower * 1.5f, ForceMode2D.Impulse);
+            }
+            // 점프 중에 또 점프할 경우
+            else
+            {
+                rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+            }
+        }
+        */
     }
 
     void FlipX()
@@ -328,8 +357,9 @@ public class PlayerController : MonoBehaviour
             {
                 animator.SetBool("isRun", true);
 
+                // 공중에 떠 있을때, 기어가고 있을 때, 점프 중일 때는 대쉬 X
                 // Dash: Run 상태에서 canDash일때 shift를 누르면 실행
-                if (canDash && Input.GetKeyDown(KeyCode.LeftShift))
+                if (canDash && Input.GetKeyDown(KeyCode.LeftShift) && !isFall && !isCrawl && !isJump)
                 {
                     animator.SetTrigger("isDash");
                     canDash = false;
@@ -354,17 +384,6 @@ public class PlayerController : MonoBehaviour
 
         if(rayHitSneak.collider != null)
         {
-            /*
-            // 포복 상태에서도 대쉬 가능
-            if (canDash && Input.GetKeyDown(KeyCode.LeftShift))
-            {
-                animator.SetBool("isSneak", false);
-                animator.SetTrigger("isDash");
-                canDash = false;        
-                Dash(); // defaultSpeed를 일시적으로 늘려 빠르게 달리는 것처럼 보이게하는 함수
-            }
-            */
-
             isCrawl = true; // 엎드리고 있음을 true로 한다.
 
             // 웅크린 상태에선 좁은 통로를 지날 수 있도록 콜라이더 크기와 오프셋을 조절한다.
@@ -482,7 +501,7 @@ public class PlayerController : MonoBehaviour
         // RayCast for Wall Climb
         Debug.DrawRay(rigid.position - new Vector2(0, 0.3f), sprite.flipX == true ? Vector3.left : Vector3.right, new Color(0, 1, 0));
 
-        RaycastHit2D rayHit = Physics2D.Raycast(rigid.position - new Vector2(0, 0.3f), sprite.flipX == true ? Vector3.left : Vector3.right, 0.6f, LayerMask.GetMask("Platform"));
+        rayHit = Physics2D.Raycast(rigid.position - new Vector2(0, 0.3f), sprite.flipX == true ? Vector3.left : Vector3.right, 0.6f, LayerMask.GetMask("Platform"));
 
         // 벽을 마주한 경우
         if (rayHit.collider != null)
@@ -490,10 +509,11 @@ public class PlayerController : MonoBehaviour
             // 천천히 미끄러지도록 마찰력 up
             rigid.sharedMaterial.friction = wallSlideFriction;
 
-            isWallTouch = true;
+            //isWallTouch = true;
             // 스프라이트가 벽에 밀착되도록 사이즈와 디렉션을 조절한다.
             capsule.direction = CapsuleDirection2D.Vertical;
             capsule.size = new Vector2(0.06f, capsule.size.y);
+
 
             // 벽과 닿은 상태인데 속력이 0이거나 음수 -> 미끄러지는 중이거나 벽과 닿은 상태
             if (rigid.velocity.y <= 0)

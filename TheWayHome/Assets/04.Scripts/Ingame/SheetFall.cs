@@ -29,14 +29,18 @@ public class SheetFall : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.tag == "Player")
-        {
-            Invoke("DelayToFall", 1.5f);    
-        }
-
         if(collision.gameObject.tag == "Ground")
         {
             DisableSheet(); // 땅에 떨어진 경우 바로 비활성화
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        // 플레이어의 발과 닿은 경우에만 떨어짐.
+        if (collision.gameObject.tag == "GroundCheck")
+        {
+            Invoke("DelayToFall", 1.5f);
         }
     }
 
