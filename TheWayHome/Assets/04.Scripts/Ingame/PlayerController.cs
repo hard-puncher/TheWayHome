@@ -55,9 +55,9 @@ public class PlayerController : MonoBehaviour
     public GameObject attackRange;  // 공격 범위 게임오브젝트
     public float defaultFriction = 0.03f;   // 기본 마찰력(계단을 부드럽게 올라가는 정도)
     public float wallSlideFriction = 0.3f; // 벽에 닿았을 때 마찰력(잘 미끄러지지 않게끔)
-    public int jumpCount;   // 점프 가능 횟수(기본 1회)
-    public int currentJumpCount;    // 실제 적용할 점프 가능 횟수(아이템 먹을 시 2회)
-
+    public int jumpCount;   // 남은 점프 가능 횟수
+    public int maxJumpCount;    // 최대 점프 가능 횟수(기본 2회)
+   
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
@@ -80,6 +80,11 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (isGround)
+        {
+            animator.SetBool("isFall", false);
+        }
+            
         CheckDie();
 
         // 대쉬 딜레이 측정
@@ -134,7 +139,7 @@ public class PlayerController : MonoBehaviour
         {
             isJump = false;
             isGround = true;
-            jumpCount = currentJumpCount;
+            jumpCount = 0;
             animator.SetBool("isFall", false);
             animator.SetBool("isJump", false);
         }
@@ -144,14 +149,26 @@ public class PlayerController : MonoBehaviour
         {
             isJump = false;
             isGround = true;
-            jumpCount = currentJumpCount;
+            jumpCount = 0;
             animator.SetBool("isFall", false);
             animator.SetBool("isJump", false);
         }
-        
+    }
 
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Ground")
+        {
+            isFall = true;
+            isDash = false;
+            isGround = false;
+        } 
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
         // 무적상태가 아니면서 적과 부딪혔을 때
-        if(collision.gameObject.tag == "Enemy" && !isInvincible)
+        if (collision.gameObject.tag == "Enemy" && !isInvincible)
         {
             // 피격 사운드 재생
             SoundManager.instance.PlaySE("Hit");
@@ -170,22 +187,19 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("isFall", false);
             animator.SetBool("isJump", false);
 
-            animator.SetTrigger("isHurt");       
+            animator.SetTrigger("isHurt");
         }
-    }
 
-    void OnCollisionExit2D(Collision2D collision)
-    {
+        // 플레이어가 트리거 상태에서 땅과 충돌 -> 엄폐 상태이므로 추락 방지를 위해 속도 0
         if (collision.gameObject.tag == "Ground")
         {
-            isFall = true;
-            isDash = false;
-            isGround = false;
-        } 
-    }
+            jumpCount = 0;
+            isGround = true;
+            rigid.velocity = Vector2.zero;
+            animator.SetBool("isFall", false);
+            animator.SetBool("isJump", false);
+        }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
         if (collision.gameObject.tag == "DeadZone")
         {
             rigid.velocity = new Vector2(0, 0); // y속도를 0으로 만들지 않으면 fall 애니메이션이 재생된다.
@@ -199,7 +213,9 @@ public class PlayerController : MonoBehaviour
         if(collision.gameObject.tag == "JumpStone")
         {
             isGround = true;
-            jumpCount++;
+            if (jumpCount <= 0)
+                return;
+            jumpCount--;
         }
     }
 
@@ -290,52 +306,16 @@ public class PlayerController : MonoBehaviour
     // 점프
     void Jump()
     {
-        
-        // 점프 가능횟수가 0이 아니고 스페이스바를 눌렀을 때
-        if (Input.GetKeyDown(KeyCode.Space) && isGround && jumpCount > 0)
+        if (Input.GetKeyDown(KeyCode.Space) && jumpCount < maxJumpCount)
         {
-            isJump = true;
-
             // Jump 애니메이션
             animator.SetBool("isJump", true);
             animator.SetBool("isFall", false);
 
-            // 추락중에 점프할 경우 점프가 약해지므로 약간 보정
-            if (rigid.velocity.y < 0f)
-            {
-                rigid.AddForce(Vector2.up * jumpPower * 1.5f, ForceMode2D.Impulse);
-            }
-            // 점프 중에 또 점프할 경우
-            else
-            {
-                rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
-            }      
-
-            jumpCount--;    // 점프 가능 횟수 차감     
+            rigid.velocity = Vector2.zero;
+            rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+            jumpCount++;
         }
-        
-        /*
-        // isGround이고 스페이스바를 눌렀을 때
-        if (Input.GetKeyDown(KeyCode.Space) && isGround)
-        {
-            isJump = true;
-
-            // Jump 애니메이션
-            animator.SetBool("isJump", true);
-            animator.SetBool("isFall", false);
-
-            // 추락중에 점프할 경우 점프가 약해지므로 약간 보정
-            if (rigid.velocity.y < 0f)
-            {
-                rigid.AddForce(Vector2.up * jumpPower * 1.5f, ForceMode2D.Impulse);
-            }
-            // 점프 중에 또 점프할 경우
-            else
-            {
-                rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
-            }
-        }
-        */
     }
 
     void FlipX()
@@ -474,6 +454,14 @@ public class PlayerController : MonoBehaviour
         // 공격 중엔 이동하지 않는다.
         if (isAttack)
             return;
+
+        /*
+        float horizontalInput = Input.GetAxis("Horizontal");
+
+        transform.Translate(Vector2.right * Time.deltaTime * applySpeed * horizontalInput);
+        */
+       
+        
         // Move By Key Control
         float h = Input.GetAxisRaw("Horizontal");
 
@@ -483,6 +471,7 @@ public class PlayerController : MonoBehaviour
             rigid.velocity = new Vector2(applySpeed, rigid.velocity.y);
         else if (rigid.velocity.x < applySpeed * (-1)) //Left Max Speed
             rigid.velocity = new Vector2(applySpeed * (-1), rigid.velocity.y);
+        
     }
 
     void FallAnim()

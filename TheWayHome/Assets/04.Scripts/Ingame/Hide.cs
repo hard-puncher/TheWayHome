@@ -26,6 +26,8 @@ public class Hide : MonoBehaviour
             if (!collision.GetComponent<PlayerController>().isJump && !nowHide)
             {
                 Debug.Log("엄폐 중입니다.");
+                // 무적상태를 위해 isInvincible을 true로 한다.
+                collision.GetComponent<PlayerController>().isInvincible = true;
                 // 엄폐 중엔 점프를 막기 위해 isHide를 true로 한다.
                 collision.GetComponent<PlayerController>().isHide = true;
                 // Trigger로 바꿔도 추락하지 않도록 중력을 0으로 한다.
@@ -45,6 +47,8 @@ public class Hide : MonoBehaviour
     {
         if(collision.gameObject.tag == "Player")
         {
+            // 무적상태 해제를 위해 isInvincible을 false로 한다.
+            collision.GetComponent<PlayerController>().isInvincible = false;
             // nowHide를 false로 바꿔서, 다시 엄폐할 수 있게 한다.
             nowHide = false;
             Debug.Log("엄폐를 해제합니다.");

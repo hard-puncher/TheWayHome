@@ -159,7 +159,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5221ed3034a593b4aac8eb5875c05c17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  wallCheckCollider: {fileID: 0}
   isJump: 0
   isGround: 0
   canDash: 1
@@ -187,8 +186,8 @@ MonoBehaviour:
   attackRange: {fileID: 7246860793838861591}
   defaultFriction: 0.03
   wallSlideFriction: 0.3
-  jumpCount: 2
-  currentJumpCount: 2
+  jumpCount: 0
+  maxJumpCount: 2
 --- !u!1 &7246860793838861591
 GameObject:
   m_ObjectHideFlags: 0
@@ -257,7 +256,7 @@ GameObject:
   m_Component:
   - component: {fileID: 490473699424616412}
   - component: {fileID: 4425657459261824605}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: GroundCheck
   m_TagString: GroundCheck
   m_Icon: {fileID: 0}

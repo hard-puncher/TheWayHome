@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5811723562154970039}
   - component: {fileID: 2204377328894028086}
-  m_Layer: 3
+  m_Layer: 0
   m_Name: GroundCheck
   m_TagString: GroundCheck
   m_Icon: {fileID: 0}
@@ -302,5 +302,5 @@ MonoBehaviour:
   attackRange: {fileID: 6569122287562333657}
   defaultFriction: 0.03
   wallSlideFriction: 0.3
-  jumpCount: 1
-  currentJumpCount: 1
+  jumpCount: 0
+  maxJumpCount: 2
