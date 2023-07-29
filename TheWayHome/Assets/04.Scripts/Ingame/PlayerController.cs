@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -50,6 +51,9 @@ public class PlayerController : MonoBehaviour
     
     public float knockBackPower;    // 캐릭터별 넉백당하는 정도
 
+    // 캐릭터별 최대 체력.
+    public int maxHp;
+    
     [Space(10f)]
     [Header("Common")] 
     public GameObject attackRange;  // 공격 범위 게임오브젝트
@@ -69,7 +73,6 @@ public class PlayerController : MonoBehaviour
     // 게임 시작후 캐릭터가 활성화될 때
     private void OnEnable()
     {
-        
         // 게임 시작 시 메인카메라를 찾아서 플레이어 자식으로 연결
         GameObject mainCamera = GameObject.FindGameObjectWithTag("MainCamera");
         mainCamera.transform.SetParent(gameObject.transform);
@@ -153,20 +156,7 @@ public class PlayerController : MonoBehaviour
             animator.SetBool("isFall", false);
             animator.SetBool("isJump", false);
         }
-    }
 
-    void OnCollisionExit2D(Collision2D collision)
-    {
-        if (collision.gameObject.tag == "Ground")
-        {
-            isFall = true;
-            isDash = false;
-            isGround = false;
-        } 
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
         // 무적상태가 아니면서 적과 부딪혔을 때
         if (collision.gameObject.tag == "Enemy" && !isInvincible)
         {
@@ -174,7 +164,7 @@ public class PlayerController : MonoBehaviour
             SoundManager.instance.PlaySE("Hit");
 
             // 적 공격력만큼 체력 감소
-            GameManager.Instance.playerCurHP -= collision.gameObject.GetComponent<EnemyController>().enemyDamage;
+            GameManager.Instance.DecreaseHP(collision.gameObject.GetComponent<EnemyController>().enemyDamage);
 
             CheckDie();
 
@@ -190,6 +180,20 @@ public class PlayerController : MonoBehaviour
             animator.SetTrigger("isHurt");
         }
 
+    }
+
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "FallingSheet")
+        {
+            isFall = true;
+            isDash = false;
+            isGround = false;
+        } 
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
         // 플레이어가 트리거 상태에서 땅과 충돌 -> 엄폐 상태이므로 추락 방지를 위해 속도 0
         if (collision.gameObject.tag == "Ground")
         {
@@ -204,7 +208,7 @@ public class PlayerController : MonoBehaviour
         {
             rigid.velocity = new Vector2(0, 0); // y속도를 0으로 만들지 않으면 fall 애니메이션이 재생된다.
             rigid.isKinematic = true;   // 추락 멈춘다.
-            GameManager.Instance.playerCurHP = 0f;      // 체력 0으로 만들어 CheckDie 조건 충족 시켜준다.
+            GameManager.Instance.DecreaseHP(GameManager.Instance.curHp);
             Debug.Log("맵 바깥으로 떨어졌습니다. 게임 오버입니다.");
             CheckDie();
         }
@@ -236,13 +240,14 @@ public class PlayerController : MonoBehaviour
     // 사망 체크
     public void CheckDie()
     {
-        if (GameManager.Instance.playerCurHP <= 0f && !isDie)
+        if (GameManager.Instance.curHp <= 0 && !isDie)
         {
             isDie = true;
 
             // 땅에 착지한 상태로 사망한 경우만 그자리에서 멈춘다.
             if(isGround && !isWallTouch)
             {
+                //rigid.velocity = Vector2.zero;
                 capsule.enabled = false;
                 rigid.isKinematic = true;
             }
@@ -274,6 +279,7 @@ public class PlayerController : MonoBehaviour
             canAttack = false;
             isAttack = true;
             animator.SetTrigger("isAttack");
+            animator.SetBool("isFall", false);
             attackRange.SetActive(true);
             // 공격을 할 때 플레이어 스프라이트 flipX가 True이면 attackRange의 콜라이더는 살짝 왼쪽에, False이면 오른쪽에 그대로 활성화한다.
             attackRange.GetComponent<BoxCollider2D>().offset = sprite.flipX == true ? new Vector2(-0.18f, 0f) : new Vector2(0f, 0f);
@@ -455,13 +461,6 @@ public class PlayerController : MonoBehaviour
         if (isAttack)
             return;
 
-        /*
-        float horizontalInput = Input.GetAxis("Horizontal");
-
-        transform.Translate(Vector2.right * Time.deltaTime * applySpeed * horizontalInput);
-        */
-       
-        
         // Move By Key Control
         float h = Input.GetAxisRaw("Horizontal");
 
@@ -477,7 +476,7 @@ public class PlayerController : MonoBehaviour
     void FallAnim()
     {
         // 추락중일 때는(속도가 음수)
-        if (rigid.velocity.y < 0 && isFall)
+        if (rigid.velocity.y < 0 && isFall && !isAttack && !isDie)
         {
             // Fall 애니메이션
             animator.SetBool("isJump", false);
@@ -498,7 +497,7 @@ public class PlayerController : MonoBehaviour
             // 천천히 미끄러지도록 마찰력 up
             rigid.sharedMaterial.friction = wallSlideFriction;
 
-            //isWallTouch = true;
+            isWallTouch = true;
             // 스프라이트가 벽에 밀착되도록 사이즈와 디렉션을 조절한다.
             capsule.direction = CapsuleDirection2D.Vertical;
             capsule.size = new Vector2(0.06f, capsule.size.y);

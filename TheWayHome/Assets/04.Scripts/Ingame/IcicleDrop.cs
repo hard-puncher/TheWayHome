@@ -42,7 +42,8 @@ public class IcicleDrop : MonoBehaviour
 
             collision.gameObject.GetComponent<Animator>().SetTrigger("isHurt");
 
-            GameManager.Instance.playerCurHP -= icicleDamage;
+            GameManager.Instance.DecreaseHP(icicleDamage);
+            //GameManager.Instance.playerCurHP -= icicleDamage;
         }
              
         if(rigid.velocity.y < 0 && collision.gameObject.tag == "Ground")

@@ -1159,7 +1159,7 @@ GameObject:
   - component: {fileID: 2378986143779728163}
   - component: {fileID: 3877720087838368147}
   m_Layer: 0
-  m_Name: TilePalette
+  m_Name: SnowPalette
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

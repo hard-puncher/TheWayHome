@@ -50,16 +50,21 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Slider seSlider;    // se 슬라이더
 
-    // 플레이어 체력
-    public float playerMaxHP = 100f;  // 플레이어 최대 체력(100초)
-    public float playerCurHP; // 플레이어 현재 체력
-
     public GameObject backGround_Day;
     public GameObject backGround_Night;
 
+    // 체력 및 체력 UI
+    [SerializeField] private GameObject go_HpUI;    // hp를 grid layout group으로 관리할 부모 객체.
+    [SerializeField] private GameObject hpOriginalPref; // 슬롯이 되는 hp 프리팹.
+    public int curHp;
+    public int maxHp;
+    [SerializeField] private Image[] hpImages;  // 이미지 배열(캐릭터 별 체력 총량만큼 초기화)
+    [SerializeField] private Sprite hpDefault;    // 기본 하트 이미지
+    [SerializeField] private Sprite hpDecrease;   // 체력 감소 시 하트 이미지
+
     private void Awake()
     {
-        instance = this;
+        instance = this;     
     }
 
     private void Start()
@@ -92,38 +97,64 @@ public class GameManager : MonoBehaviour
         // 저장된 선택한 캐릭터 인덱스 가져오기
         int selectedCharacterIndex = PlayerPrefs.GetInt("SelectedCharacterIndex", -1);
 
-        if(selectedCharacterIndex != -1 && selectedCharacterIndex < characters.Length)
+        if (selectedCharacterIndex != -1 && selectedCharacterIndex < characters.Length)
         {
             // 선택한 캐릭터 인덱스에 해당하는 캐릭터 생성
             player = Instantiate(characters[selectedCharacterIndex]);
         }
 
-        // 체력 초기화
-        playerCurHP = playerMaxHP;
+        // 캐릭터별 고유 체력으로 초기화.
+        maxHp = player.GetComponent<PlayerController>().maxHp;
+        curHp = maxHp;
+        hpImages = new Image[maxHp];    // 이미지의 개수는 캐릭터의 maxHp에 맞게 초기화.
+
+        for (int i = 0; i < hpImages.Length; i++)
+        {
+            hpImages[i] = Instantiate(hpOriginalPref, go_HpUI.transform).GetComponent<Image>();
+            hpImages[i].sprite = hpDefault; // 기본 하트 이미지로 초기화
+        }
     }
 
     private void Update()
     {
-        DecreaseHPOverTime();
-        UpdateHPBar();
-
         backGround_Day.transform.position = player.transform.position;
         backGround_Night.transform.position = player.transform.position;
     }
 
-    // 실시간 체력 감소
-    private void DecreaseHPOverTime()
+    // 체력 증가 함수(생선 섭취 시)
+    public void IncreaseHP(int _item)
     {
-        playerCurHP -= Time.deltaTime;      
+        curHp += _item;
 
-        if (playerCurHP < 0f)
-            playerCurHP = 0f;
+        for (int i = 0; i < maxHp; i++)
+        {
+            if (i < curHp)
+            {
+                hpImages[i].sprite = hpDefault;
+            }
+            else
+            {
+                hpImages[i].sprite = hpDecrease;
+            }
+        }
     }
 
-    // 슬라이더 갱신
-    private void UpdateHPBar()
+    // 체력 감소 함수(적, 장애물에 피격 시 호출)
+    public void DecreaseHP(int _damage)
     {
-        playerHPBar.value = playerCurHP / playerMaxHP;
+        curHp -= _damage;
+
+        for(int i = 0; i < maxHp; i++)
+        {
+            if(i < curHp)
+            {
+                hpImages[i].sprite = hpDefault;
+            }
+            else
+            {
+                hpImages[i].sprite = hpDecrease;
+            }
+        }
     }
 
     // 일시정지 버튼

@@ -16,10 +16,11 @@ public class GetFish : MonoBehaviour
             else
                 SoundManager.instance.PlaySE("GetFood2");
 
-            GameManager.Instance.playerCurHP += 30f;
+            GameManager.Instance.curHp += 1;
+            GameManager.Instance.IncreaseHP(1);
             // 체력은 최대 체력 이상으로 회복할 수 없게 제한
-            if (GameManager.Instance.playerCurHP > GameManager.Instance.playerMaxHP)
-                GameManager.Instance.playerCurHP = GameManager.Instance.playerMaxHP;
+            if (GameManager.Instance.curHp > GameManager.Instance.maxHp)
+                GameManager.Instance.curHp = GameManager.Instance.maxHp;
             gameObject.SetActive(false);
         }
     }

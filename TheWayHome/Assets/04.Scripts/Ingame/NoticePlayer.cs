@@ -17,13 +17,19 @@ public class NoticePlayer : MonoBehaviour
         {
             time += Time.deltaTime;
             // 알아차리는데 걸리는 시간보다 커지면
-            if(time >= noticeTime )
+            if(time >= noticeTime)
             {
                 isNotice = true;    // isNotice를 true로 만들어 부모 객체인 EnemyController에서 추격을 시작하게 한다.
                 // 조건 초기화
                 time = 0f;
-                isInNoticeRange = false;
+                //isInNoticeRange = false;
             }
+        }
+        else
+        {
+            time -= Time.deltaTime;
+            if (time <= 0)
+                time = 0f;
         }
     }
 

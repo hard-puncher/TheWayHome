@@ -146,4 +146,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df875e34bf9c64a45851106e7df3e9fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  icicleDamage: 5
+  icicleDamage: 1

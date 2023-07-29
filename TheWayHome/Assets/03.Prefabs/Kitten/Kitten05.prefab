@@ -299,6 +299,11 @@ MonoBehaviour:
   maxClimbSpeed: 3
   attackDelay: 0
   knockBackPower: 30
+  curHp: 0
+  maxHp: 5
+  hpImages: []
+  hpDefault: {fileID: 0}
+  hpDecrease: {fileID: 0}
   attackRange: {fileID: 6569122287562333657}
   defaultFriction: 0.03
   wallSlideFriction: 0.3
