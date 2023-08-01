@@ -79,8 +79,9 @@ public class HelperController : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // 플레이어와 부딪힌 경우에도 탐지 했다고 보고 멈춘다.
-        if (collision.gameObject.tag == "Player")
+        if (collision.gameObject.tag == "Player" && !isTouchPlayer)
         {
+            box.isTrigger = true;
             alertUI.SetActive(true);
             rigid.velocity = Vector2.zero;
             isTouchPlayer = true;

@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7813679128845770680}
   - component: {fileID: 3342133639555062203}
   - component: {fileID: -1936111968736766927}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fish
   m_TagString: Fish
   m_Icon: {fileID: 0}
@@ -101,8 +101,8 @@ CapsuleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0.04}
-  m_Size: {x: 1.6, y: 0.9}
+  m_Offset: {x: -0.000000011258889, y: -0.09444642}
+  m_Size: {x: 1.6000003, y: 1.1688961}
   m_Direction: 1
 --- !u!61 &7813679128845770680
 BoxCollider2D:
