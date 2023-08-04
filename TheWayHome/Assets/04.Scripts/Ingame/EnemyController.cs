@@ -15,10 +15,6 @@ public class EnemyController : MonoBehaviour
     Vector3 originLocalScale;   // 스프라이트 flipX대신 localScale로 뒤집기 위해 원래 로컬 스케일을 저장해둔다.
                                 // (앞은 ray로 감지 중이므로 뒤통수에만 감지 콜라이더를 달 것이다. flipX로 하면 자식 객체인 레이더는 안뒤집어지므로 localScale로 뒤집는 것
 
-    // 콜라이더 오프셋 조절을 위한 변수(왼쪽으로 이동할때는 offsetX를 반전시켜줘야함)
-    Vector2 originOffset;
-    Vector2 leftOffset;
-
     public int nextMove;    // 이동 방향 변수
     public int enemySpeed;  // 실제 이동 속도
     public int enemyDefaultSpeed = 2;   // 기본 걸음 속도
@@ -49,11 +45,7 @@ public class EnemyController : MonoBehaviour
 
         originLocalScale = this.transform.localScale;
 
-        originOffset = new Vector2(box.offset.x, box.offset.y);
-        leftOffset = new Vector2(-box.offset.x, box.offset.y);
-
         Invoke("Think", 5f);
-
     }
 
     private void Start()
@@ -64,7 +56,12 @@ public class EnemyController : MonoBehaviour
     }
 
     private void Update()
-    {
+    {     
+        if(GameManager.Instance.player.GetComponent<PlayerController>().isHide)
+        {
+            isFindPlayer = false;
+        }
+
         NoticeFromBehind(); // 적 뒤에서 플레이어가 머무를 경우 플레이어를 인식하고 쫒아가는 함수(은신, 엎드리기 상태일 때 제외)
 
         if(alertGage.activeSelf)
@@ -95,21 +92,42 @@ public class EnemyController : MonoBehaviour
             }        
         }
 
+        
+
         // 플레이어 탐지 불가 상태일 때 (적 뒤통수의 탐지 레이더에서 벗어낫을 때, 앞통수 ray범위 밖일 때)
         if(!isFindPlayer)
-            time = 0;
+        { 
+            if (rayHit.collider == null)
+            {
+                time -= Time.deltaTime;
+                scaleY = time / findTime;
+
+                // 탐지 게이지 업데이트
+                alertGage.transform.localScale = new Vector3(1, scaleY, 1);
+
+                if (scaleY <= 0)
+                    scaleY = 0;
+
+                if (time <= 0)
+                {
+                    time = 0;
+                    MissPlayer();
+                }
+            }
+        }         
     }
 
 
     void FixedUpdate()
     {
         Move(); // 지형 체크    
+        
         FindPlayer();   // 플레이어 체크
         // 이동 속도
         rigid.velocity = new Vector2(nextMove, rigid.velocity.y) * enemySpeed;
     }
 
-    private void OnCollisonEnter2D(Collision2D collision)
+    private void OnCollisionEnter2D(Collision2D collision)
     {
         // 플레이어와 부딪힌 경우에도 탐지 했다고 보고 즉시 플레이어 방향으로 달려간다.
         if(collision.gameObject.tag == "Player")
@@ -200,7 +218,6 @@ public class EnemyController : MonoBehaviour
             animator.SetBool("isRun", true);
 
             enemySpeed = enemyPlayerFindSpeed;  // 플레이어 발견시 2배속으로 이동
-                                                //Debug.Log("플레이어 발견!");
 
             // 플레이어가 왼쪽에 있는 경우
             if (rayHit.collider.transform.position.x < rigid.position.x)
@@ -213,11 +230,13 @@ public class EnemyController : MonoBehaviour
                 nextMove = 1;
             }
         }
-        else
+        else if(rayHit.collider == null)
         {
-            // 탐지 UI 비활성화
-            MissPlayer();
             
+            // 탐지 UI 비활성화
+            //MissPlayer();
+            isFindPlayer = false;
+
             animator.SetBool("isRun", false);
             if(nextMove != 0)
                 animator.SetBool("isWalk", true);
@@ -275,6 +294,7 @@ public class EnemyController : MonoBehaviour
         alertSign.text = "!";
         discoverOutline.SetActive(true);
         isFindPlayer = true;
+        time = findTime;
     }
 
     // 플레이어 놓침
@@ -286,5 +306,6 @@ public class EnemyController : MonoBehaviour
         discoverOutline.SetActive(false);
         alertUI.SetActive(false);
         isFindPlayer = false;
+        time = 0;
     }
 }

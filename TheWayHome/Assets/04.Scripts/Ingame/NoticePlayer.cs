@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class NoticePlayer : MonoBehaviour
 {
+    //public bool isOutNoticeRange;   // 탐지 범위 안에 들어왔다가 나갔을 때 게이지를 다시 감소시키기 위한 변수
     public bool isInNoticeRange;    // 탐지 범위 안에 들어 왔는지 여부
     public bool isNotice;   // 적을 탐지 했는지 여부
 
@@ -15,6 +16,11 @@ public class NoticePlayer : MonoBehaviour
         // 탐지 범위 안에 들어옴이 true이면 시간을 계산을 시작
         if(isInNoticeRange)
         {
+            if(GameManager.Instance.player.GetComponent<PlayerController>().isHide)
+            {
+                return;
+            }
+
             time += Time.deltaTime;
             // 알아차리는데 걸리는 시간보다 커지면
             if(time >= noticeTime)
