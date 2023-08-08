@@ -16,11 +16,18 @@ public class GetFish : MonoBehaviour
             else
                 SoundManager.instance.PlaySE("GetFood2");
 
+            // 아이템 습득, 인벤토리에 추가.
+            Item item = this.GetComponent<GetItem>().item;
+            Debug.Log(item.name);
+            collision.gameObject.GetComponent<PlayerController>().inventory.AcquireItem(item);
+
+            /*
             GameManager.Instance.curHp += 1;
             GameManager.Instance.IncreaseHP(1);
             // 체력은 최대 체력 이상으로 회복할 수 없게 제한
             if (GameManager.Instance.curHp > GameManager.Instance.maxHp)
                 GameManager.Instance.curHp = GameManager.Instance.maxHp;
+            */
             gameObject.SetActive(false);
         }
     }

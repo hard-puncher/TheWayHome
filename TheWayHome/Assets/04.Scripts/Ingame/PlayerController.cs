@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
+    public Inventory inventory;
+
     // 필요한 컴포넌트
     Rigidbody2D rigid;
     CapsuleCollider2D capsule;
@@ -68,6 +70,8 @@ public class PlayerController : MonoBehaviour
         capsule = GetComponent<CapsuleCollider2D>();
         sprite = GetComponent<SpriteRenderer>();
         animator = GetComponent<Animator>();
+
+        inventory = GameObject.Find("InventoryGroup").GetComponent<Inventory>();
     }
     
     // 게임 시작후 캐릭터가 활성화될 때
